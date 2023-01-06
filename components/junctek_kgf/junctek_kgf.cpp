@@ -5,8 +5,9 @@
 #include <string>
 #include <string.h>
 
+#include<setjmp.h>
+static jmp_buf parsing_failed;
 static const char *const TAG = "JunkTek KG-F";
-
 
 // Get a value where it's expected to be "<number>[,.], incrementing the cursor past the end"
 int getval(const char*& cursor)
@@ -16,11 +17,13 @@ int getval(const char*& cursor)
   const long val = strtoll(pos, &end, 10);
   if (end == pos || end == nullptr)
   {
-    throw std::runtime_error("invalid number");
+    ESP_LOGE("JunkTekKGF", "Error invalid number %s", cursor);
+    longjmp(parsing_failed, 1);
   }
   if (*end != ',' && *end != '.')
   {
-    throw std::runtime_error("no coma");
+    ESP_LOGE("JunkTekKGF", "Error no coma %s", cursor);
+    longjmp(parsing_failed, 1);
   }
   cursor = end + 1;
   return val;
@@ -110,20 +113,17 @@ void JuncTekKGF::handle_status(const char* buffer)
 
 void JuncTekKGF::handle_line()
 {
+  //A failure in parsing will return back to here with a non-zero value
+  if (setjmp(parsing_failed))
+    return;
+  
   const char* buffer = &this->line_buffer_[0];
-  try
-  {
-    if (buffer[0] != ':' || buffer[1] != 'r')
-      return;
-    if (strncmp(&buffer[2], "50=", 3) == 0)
-      handle_status(&buffer[5]);
-    else if (strncmp(&buffer[2], "51=", 3) == 0)
-      handle_settings(&buffer[5]);
-  }
-  catch(const std::exception& e)
-  {
-    ESP_LOGE("JunkTekKGF", "Error %s %s",e.what(), buffer);
-  }
+  if (buffer[0] != ':' || buffer[1] != 'r')
+    return;
+  if (strncmp(&buffer[2], "50=", 3) == 0)
+    handle_status(&buffer[5]);
+  else if (strncmp(&buffer[2], "51=", 3) == 0)
+    handle_settings(&buffer[5]);
 
   return;
 }
@@ -154,17 +154,10 @@ bool JuncTekKGF::readline()
 bool JuncTekKGF::verify_checksum(int checksum, const char* buffer)
 {
   long total = 0;
-  try
+  while (true)
   {
-    while (true)
-    {
-      const int val = getval(buffer);
-      total += val;
-    }
-  }
-  catch (...)
-  {
-
+    const int val = getval(buffer);
+    total += val;
   }
   const bool checksum_valid = (total % 255) + 1 == checksum;
   ESP_LOGD("JunkTekKGF", "Recv checksum %d total %ld valid %d", checksum, total, checksum_valid);
