@@ -163,7 +163,8 @@ bool JuncTekKGF::verify_checksum(int checksum, const char* buffer)
 //     }
 //   const bool checksum_valid = (total % 255) + 1 == checksum;
 //   ESP_LOGD("JunkTekKGF", "Recv checksum %d total %ld valid %d", checksum, total, checksum_valid);
-  return checksum_valid;
+//   return checksum_valid;
+  return true;
 }
 
 void JuncTekKGF::loop()
@@ -176,6 +177,7 @@ void JuncTekKGF::loop()
     char buffer[20];
     sprintf(buffer, ":R51=%d,2,1,\r\n", this->address_);
     write_str(buffer);
+    ESP_LOGE("JunkTekKGF", "buffer = %s", buffer);
   }
 
   if (!this->last_stats_ || (*this->last_stats_ + (10 * 1000)) < start_time)
@@ -184,8 +186,9 @@ void JuncTekKGF::loop()
     char buffer[20];
     sprintf(buffer, ":R50=%d,2,1,\r\n", this->address_);
     write_str(buffer);
+    ESP_LOGE("JunkTekKGF", "buffer = %s", buffer);
   }
-  ESP_LOGE("JunkTekKGF", "buffer = %s", buffer);
+
 
 //   if (readline())
 //   {
