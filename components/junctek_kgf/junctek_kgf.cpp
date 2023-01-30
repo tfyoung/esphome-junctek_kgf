@@ -108,25 +108,19 @@ void JuncTekKGF::dump_config()
 //   this->last_stats_ = millis();
 // }
 
-// void JuncTekKGF::handle_line()
-// {
-//   const char* buffer = &this->line_buffer_[0];
-//   try
-//   {
-//     if (buffer[0] != ':' || buffer[1] != 'r')
-//       return;
-//     if (strncmp(&buffer[2], "50=", 3) == 0)
-//       handle_status(&buffer[5]);
-//     else if (strncmp(&buffer[2], "51=", 3) == 0)
-//       handle_settings(&buffer[5]);
-//   }
-//   catch(const std::exception& e)
-//   {
-//     ESP_LOGE("JunkTekKGF", "Error %s %s",e.what(), buffer);
-//   }
+void JuncTekKGF::handle_line()
+{
+  const char* buffer = &this->line_buffer_[0];
+  ESP_LOGE("JunkTekKGF", "buffer = %s", buffer);
+//   if (buffer[0] != ':' || buffer[1] != 'r')
+//     return;
+//   if (strncmp(&buffer[2], "50=", 3) == 0)
+//     handle_status(&buffer[5]);
+//   else if (strncmp(&buffer[2], "51=", 3) == 0)
+//     handle_settings(&buffer[5]);
 
-//   return;
-// }
+  return;
+}
 
 bool JuncTekKGF::readline()
 {
