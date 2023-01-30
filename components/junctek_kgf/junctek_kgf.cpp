@@ -9,22 +9,23 @@ static const char *const TAG = "JunkTek KG-F";
 
 
 // Get a value where it's expected to be "<number>[,.], incrementing the cursor past the end"
-// int getval(const char*& cursor)
-// {
-//   const char* pos = cursor;
-//   char* end = nullptr;
-//   const long val = strtoll(pos, &end, 10);
-//   if (end == pos || end == nullptr)
-//   {
-//     throw std::runtime_error("invalid number");
-//   }
-//   if (*end != ',' && *end != '.')
-//   {
-//     throw std::runtime_error("no coma");
-//   }
-//   cursor = end + 1;
-//   return val;
-// }
+int getval(const char*& cursor)
+{
+  const char* pos = cursor;
+  char* end = nullptr;
+  const long val = strtoll(pos, &end, 10);
+  ESP_LOGE("JunkTekKGF", "val = %s", val);
+  if (end == pos || end == nullptr)
+  {
+    return -1;
+  }
+  if (*end != ',' && *end != '.')
+  {
+    return -2;
+  }
+  cursor = end + 1;
+  return val;
+}
 
 JuncTekKGF::JuncTekKGF(unsigned address)
   : address_(address)
@@ -75,14 +76,20 @@ void JuncTekKGF::dump_config()
 void JuncTekKGF::handle_status(const char* buffer)
 {
   const char* cursor = buffer;
-    ESP_LOGE("JunkTekKGF", "buffer = %s", buffer);
-//   const int address = getval(cursor);
-//   if (address != this->address_)
-//     return;
+  ESP_LOGE("JunkTekKGF", "buffer = %s", buffer);
+  const int address = getval(cursor);
+  ESP_LOGE("JunkTekKGF", "address = %s", address);
+   if (address != this->address_)
+     return;
 
-//   const int checksum = getval(cursor);
-//   if (! verify_checksum(checksum, cursor))
-//     return;
+   const int checksum = getval(cursor);
+   if (! verify_checksum(checksum, cursor))
+   {
+    return;
+   } else 
+   {
+       ESP_LOGE("JunkTekKGF", "verify failed");
+   }
 
 //   const float voltage = getval(cursor) / 100.0;
 //   const float amps = getval(cursor) / 100.0;
@@ -106,7 +113,7 @@ void JuncTekKGF::handle_status(const char* buffer)
 //   if (temperature_)
 //     this->temperature_->publish_state(temperature);
 
-//   this->last_stats_ = millis();
+   this->last_stats_ = millis();
 }
 
 void JuncTekKGF::handle_line()
@@ -148,18 +155,18 @@ bool JuncTekKGF::readline()
 
 bool JuncTekKGF::verify_checksum(int checksum, const char* buffer)
 {
-//   long total = 0;
+  long total = 0;
 
-//     while (true)
-//     {
-//       const int val = getval(buffer);
-//       ESP_LOGE("JunkTekKGF", "val = %d", val);
-//       total += val;
-//     }
-//   const bool checksum_valid = (total % 255) + 1 == checksum;
-//   ESP_LOGD("JunkTekKGF", "Recv checksum %d total %ld valid %d", checksum, total, checksum_valid);
-//   return checksum_valid;
-  return true;
+    while (true)
+    {
+      const int val = getval(buffer);
+      ESP_LOGE("JunkTekKGF", "val = %d", val);
+      total += val;
+    }
+  const bool checksum_valid = (total % 255) + 1 == checksum;
+  ESP_LOGD("JunkTekKGF", "Recv checksum %d total %ld valid %d", checksum, total, checksum_valid);
+  return checksum_valid;
+//  return true;
 }
 
 void JuncTekKGF::loop()
