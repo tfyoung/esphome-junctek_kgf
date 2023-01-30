@@ -120,7 +120,7 @@ void JuncTekKGF::handle_status(const char* buffer)
     this->voltage_sensor_->publish_state(voltage);
   if (battery_level_sensor_ && this->battery_capacity_ && ampHourRemaining)
     this->battery_level_sensor_->publish_state(ampHourRemaining * 100.0 / *this->battery_capacity_);
-  if (current_sensor_ && direction && amps)
+  if (current_sensor_ && (direction<0) && amps)
     current_sensor_->publish_state(direction == 0 ? amps : - amps);
   if (temperature_ && temperature)
     this->temperature_->publish_state(temperature);
