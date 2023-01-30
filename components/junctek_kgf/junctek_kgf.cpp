@@ -172,7 +172,7 @@ void JuncTekKGF::loop()
     char buffer[20];
     sprintf(buffer, ":R51=%d,2,1,\r\n", this->address_);
     write_str(buffer);
-    ESP_LOGE("JunkTekKGF", "buffer = %s", buffer);
+//    ESP_LOGE("JunkTekKGF", "buffer = %s", buffer);
   }
 
   if (!this->last_stats_ || (*this->last_stats_ + (10 * 1000)) < start_time)
@@ -181,7 +181,7 @@ void JuncTekKGF::loop()
     char buffer[20];
     sprintf(buffer, ":R50=%d,2,1,\r\n", this->address_);
     write_str(buffer);
-    ESP_LOGE("JunkTekKGF", "buffer = %s", buffer);
+//    ESP_LOGE("JunkTekKGF", "buffer = %s", buffer);
   }
 
 
