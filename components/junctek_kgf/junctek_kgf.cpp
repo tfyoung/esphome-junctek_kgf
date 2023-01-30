@@ -83,7 +83,7 @@ void JuncTekKGF::handle_status(const char* buffer)
      return;
 
    const int checksum = getval(cursor);
-    ESP_LOGE("JunkTekKGF", "checksum = %d", checksum);
+   ESP_LOGE("JunkTekKGF", "checksum = %d", checksum);
 //    if (! verify_checksum(checksum, cursor))
 //    {
 //     return;
@@ -92,18 +92,28 @@ void JuncTekKGF::handle_status(const char* buffer)
 //        ESP_LOGE("JunkTekKGF", "verify failed");
 //    }
 
-   const float voltage = getval(cursor) / 100.0;
-    ESP_LOGE("JunkTekKGF", "voltage = %f", voltage);
-//   const float amps = getval(cursor) / 100.0;
-//   const float ampHourRemaining = getval(cursor) / 1000.0;
-//   const float ampHourTotalUsed = getval(cursor) / 100.00;
-//   const float wattHourRemaining = getval(cursor) / 100.0;
-//   const float runtimeSeconds = getval(cursor);
-//   const float temperature = getval(cursor) - 100.0;
-//   const float powerInWatts = getval(cursor) / 100.0;
-//   const int relayStatus = getval(cursor);
-//   const int direction = getval(cursor);
-//   const int batteryLifeMinutes = getval(cursor);
+  const float voltage = getval(cursor) / 100.0;
+  ESP_LOGE("JunkTekKGF", "voltage = %f", voltage);
+  const float amps = getval(cursor) / 100.0;
+  ESP_LOGE("JunkTekKGF", "amperage = %f", amps);
+  const float ampHourRemaining = getval(cursor) / 1000.0;
+  ESP_LOGE("JunkTekKGF", "amps left = %f", ampoHourRemaining);
+  const float ampHourTotalUsed = getval(cursor) / 100.00;
+  ESP_LOGE("JunkTekKGF", "amps used = %f", ampHourTotalUsed);
+  const float wattHourRemaining = getval(cursor) / 100.0;
+  ESP_LOGE("JunkTekKGF", "watts left = %f", wattHourRemaining);
+  const float runtimeSeconds = getval(cursor);
+  ESP_LOGE("JunkTekKGF", "runtime = %f", runtimeSeconds);
+  const float temperature = getval(cursor) - 100.0;
+  ESP_LOGE("JunkTekKGF", "temp = %f", temperature);
+  const float powerInWatts = getval(cursor) / 100.0;
+  ESP_LOGE("JunkTekKGF", "power = %f", powerInWatts);
+  const int relayStatus = getval(cursor);
+  ESP_LOGE("JunkTekKGF", "relays = %d", relayStatus);
+  const int direction = getval(cursor);
+  ESP_LOGE("JunkTekKGF", "direction = %d", direction);
+  const int batteryLifeMinutes = getval(cursor);
+  ESP_LOGE("JunkTekKGF", "batteryLifeMinutes = %f", batteryLifeMinutes);
 //   const float batteryInternalOhms = getval(cursor) / 100.0;
 //   ESP_LOGV("JunkTekKGF", "Recv %f %f %d %f %f %f", voltage, ampHourRemaining, direction, powerInWatts, amps, temperature);
 //   if (voltage_sensor_)
