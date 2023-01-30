@@ -76,7 +76,7 @@ void JuncTekKGF::dump_config()
 void JuncTekKGF::handle_status(const char* buffer)
 {
   const char* cursor = buffer;
-  ESP_LOGE("JunkTekKGF", "buffer = %s", buffer);
+//  ESP_LOGE("JunkTekKGF", "buffer = %s", buffer);
   const int address = getval(cursor);
   ESP_LOGE("JunkTekKGF", "address = %d", address);
    if (address != this->address_)
