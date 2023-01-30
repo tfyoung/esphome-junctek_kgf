@@ -190,8 +190,14 @@ void JuncTekKGF::loop()
   }
 
 
-   if (readline())
-     ESP_LOGE("JunkTekKGF", "readline successful, buffer = %s", buffer);
+  if (readline())
+  {
+    ESP_LOGE("JunkTekKGF", "readline successful");
+  }
+  else
+  {
+      ESP_LOGE("JunkTekKGF", "readline fail");
+  }
 //   {
 //     handle_line();
 //   }
