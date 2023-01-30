@@ -163,7 +163,7 @@ bool JuncTekKGF::verify_checksum(int checksum, const char* buffer)
 //     }
 //   const bool checksum_valid = (total % 255) + 1 == checksum;
 //   ESP_LOGD("JunkTekKGF", "Recv checksum %d total %ld valid %d", checksum, total, checksum_valid);
-//   return checksum_valid;
+  return checksum_valid;
 }
 
 void JuncTekKGF::loop()
