@@ -72,9 +72,10 @@ void JuncTekKGF::dump_config()
 //   this->last_settings_ = millis();
 // }
 
-// void JuncTekKGF::handle_status(const char* buffer)
-// {
-//   const char* cursor = buffer;
+void JuncTekKGF::handle_status(const char* buffer)
+{
+  const char* cursor = buffer;
+    ESP_LOGE("JunkTekKGF", "buffer = %s", buffer);
 //   const int address = getval(cursor);
 //   if (address != this->address_)
 //     return;
@@ -106,18 +107,18 @@ void JuncTekKGF::dump_config()
 //     this->temperature_->publish_state(temperature);
 
 //   this->last_stats_ = millis();
-// }
+}
 
 void JuncTekKGF::handle_line()
 {
   const char* buffer = &this->line_buffer_[0];
-  ESP_LOGE("JunkTekKGF", "buffer = %s", buffer);
-//   if (buffer[0] != ':' || buffer[1] != 'r')
-//     return;
-//   if (strncmp(&buffer[2], "50=", 3) == 0)
-//     handle_status(&buffer[5]);
-//   else if (strncmp(&buffer[2], "51=", 3) == 0)
-//     handle_settings(&buffer[5]);
+ ESP_LOGE("JunkTekKGF", "buffer = %s", buffer);
+  if (buffer[0] != ':' || buffer[1] != 'r')
+    return;
+  if (strncmp(&buffer[2], "50=", 3) == 0)
+    handle_status(&buffer[5]);
+//  else if (strncmp(&buffer[2], "51=", 3) == 0)
+//    handle_settings(&buffer[5]);
 
   return;
 }
