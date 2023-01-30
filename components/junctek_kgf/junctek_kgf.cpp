@@ -93,36 +93,36 @@ void JuncTekKGF::handle_status(const char* buffer)
 //    }
 
   const float voltage = getval(cursor) / 100.0;
-  ESP_LOGE("JunkTekKGF", "voltage = %f", voltage);
+//  ESP_LOGE("JunkTekKGF", "voltage = %f", voltage);
   const float amps = getval(cursor) / 100.0;
-  ESP_LOGE("JunkTekKGF", "amperage = %f", amps);
+//  ESP_LOGE("JunkTekKGF", "amperage = %f", amps);
   const float ampHourRemaining = getval(cursor) / 1000.0;
-  ESP_LOGE("JunkTekKGF", "amps left = %f", ampHourRemaining);
+//  ESP_LOGE("JunkTekKGF", "amps left = %f", ampHourRemaining);
   const float ampHourTotalUsed = getval(cursor) / 100.00;
-  ESP_LOGE("JunkTekKGF", "amps used = %f", ampHourTotalUsed);
+//  ESP_LOGE("JunkTekKGF", "amps used = %f", ampHourTotalUsed);
   const float wattHourRemaining = getval(cursor) / 100.0;
-  ESP_LOGE("JunkTekKGF", "watts left = %f", wattHourRemaining);
+//  ESP_LOGE("JunkTekKGF", "watts left = %f", wattHourRemaining);
   const float runtimeSeconds = getval(cursor);
-  ESP_LOGE("JunkTekKGF", "runtime = %f", runtimeSeconds);
+//  ESP_LOGE("JunkTekKGF", "runtime = %f", runtimeSeconds);
   const float temperature = getval(cursor) - 100.0;
-  ESP_LOGE("JunkTekKGF", "temp = %f", temperature);
+//  ESP_LOGE("JunkTekKGF", "temp = %f", temperature);
   const float powerInWatts = getval(cursor) / 100.0;
-  ESP_LOGE("JunkTekKGF", "power = %f", powerInWatts);
+//  ESP_LOGE("JunkTekKGF", "power = %f", powerInWatts);
   const int relayStatus = getval(cursor);
-  ESP_LOGE("JunkTekKGF", "relays = %d", relayStatus);
+//  ESP_LOGE("JunkTekKGF", "relays = %d", relayStatus);
   const int direction = getval(cursor);
-  ESP_LOGE("JunkTekKGF", "direction = %d", direction);
+//  ESP_LOGE("JunkTekKGF", "direction = %d", direction);
   const int batteryLifeMinutes = getval(cursor);
-  ESP_LOGE("JunkTekKGF", "batteryLifeMinutes = %f", batteryLifeMinutes);
+//  ESP_LOGE("JunkTekKGF", "batteryLifeMinutes = %f", batteryLifeMinutes);
   const float batteryInternalOhms = getval(cursor) / 100.0;
   ESP_LOGE("JunkTekKGF", "Recv %f %f %d %f %f %f", voltage, ampHourRemaining, direction, powerInWatts, amps, temperature);
-  if (voltage_sensor_)
+  if (voltage_sensor_ && voltage)
     this->voltage_sensor_->publish_state(voltage);
-  if (battery_level_sensor_ && this->battery_capacity_)
+  if (battery_level_sensor_ && this->battery_capacity_ && ampHourRemaining)
     this->battery_level_sensor_->publish_state(ampHourRemaining * 100.0 / *this->battery_capacity_);
-  if (current_sensor_)
+  if (current_sensor_ && direction && amps)
     current_sensor_->publish_state(direction == 0 ? amps : - amps);
-  if (temperature_)
+  if (temperature_ && temperature)
     this->temperature_->publish_state(temperature);
 
    this->last_stats_ = millis();
