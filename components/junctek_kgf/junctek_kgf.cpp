@@ -112,7 +112,7 @@ void JuncTekKGF::handle_status(const char* buffer)
 void JuncTekKGF::handle_line()
 {
   const char* buffer = &this->line_buffer_[0];
- ESP_LOGE("JunkTekKGF", "buffer = %s", buffer);
+// ESP_LOGE("JunkTekKGF", "buffer = %s", buffer);
   if (buffer[0] != ':' || buffer[1] != 'r')
     return;
   if (strncmp(&buffer[2], "50=", 3) == 0)
