@@ -14,7 +14,6 @@ int getval(const char*& cursor)
   const char* pos = cursor;
   char* end = nullptr;
   const long val = strtoll(pos, &end, 10);
-//  ESP_LOGE("JunkTekKGF", "val = %f", val);
   if (end == pos || end == nullptr)
   {
     return -1;
@@ -77,46 +76,28 @@ void JuncTekKGF::handle_settings(const char* buffer)
 void JuncTekKGF::handle_status(const char* buffer)
 {
   const char* cursor = buffer;
-//  ESP_LOGE("JunkTekKGF", "buffer = %s", buffer);
   const int address = getval(cursor);
-//  ESP_LOGE("JunkTekKGF", "address = %d", address);
    if (address != this->address_)
      return;
 
    const int checksum = getval(cursor);
-//   ESP_LOGE("JunkTekKGF", "checksum = %d", checksum);
 //    if (! verify_checksum(checksum, cursor))
-//    {
 //     return;
-//    } else 
-//    {
-//        ESP_LOGE("JunkTekKGF", "verify failed");
-//    }
+
 
   const float voltage = getval(cursor) / 100.0;
-//  ESP_LOGE("JunkTekKGF", "voltage = %f", voltage);
   const float amps = getval(cursor) / 100.0;
-//  ESP_LOGE("JunkTekKGF", "amperage = %f", amps);
   const float ampHourRemaining = getval(cursor) / 1000.0;
-//  ESP_LOGE("JunkTekKGF", "amps left = %f", ampHourRemaining);
   const float ampHourTotalUsed = getval(cursor) / 100.00;
-//  ESP_LOGE("JunkTekKGF", "amps used = %f", ampHourTotalUsed);
   const float wattHourRemaining = getval(cursor) / 100.0;
-//  ESP_LOGE("JunkTekKGF", "watts left = %f", wattHourRemaining);
   const float runtimeSeconds = getval(cursor);
-//  ESP_LOGE("JunkTekKGF", "runtime = %f", runtimeSeconds);
   const float temperature = getval(cursor) - 100.0;
-//  ESP_LOGE("JunkTekKGF", "temp = %f", temperature);
   const float powerInWatts = getval(cursor) / 100.0;
-//  ESP_LOGE("JunkTekKGF", "power = %f", powerInWatts);
   const int relayStatus = getval(cursor);
-//  ESP_LOGE("JunkTekKGF", "relays = %d", relayStatus);
   const int direction = getval(cursor);
-//  ESP_LOGE("JunkTekKGF", "direction = %d", direction);
   const int batteryLifeMinutes = getval(cursor);
-//  ESP_LOGE("JunkTekKGF", "batteryLifeMinutes = %f", batteryLifeMinutes);
   const float batteryInternalOhms = getval(cursor) / 100.0;
-  ESP_LOGE("JunkTekKGF", "Recv %f %f %d %f %f %f", voltage, ampHourRemaining, direction, powerInWatts, amps, temperature);
+  ESP_LOGV("JunkTekKGF", "Recv %f %f %d %f %f %f", voltage, ampHourRemaining, direction, powerInWatts, amps, temperature);
   if (voltage_sensor_ && !(voltage<0))
     this->voltage_sensor_->publish_state(voltage);
   if (battery_level_sensor_ && this->battery_capacity_ && !(ampHourRemaining<0))
@@ -132,7 +113,6 @@ void JuncTekKGF::handle_status(const char* buffer)
 void JuncTekKGF::handle_line()
 {
   const char* buffer = &this->line_buffer_[0];
-// ESP_LOGE("JunkTekKGF", "buffer = %s", buffer);
   if (buffer[0] != ':' || buffer[1] != 'r')
     return;
   if (strncmp(&buffer[2], "50=", 3) == 0)
@@ -179,7 +159,6 @@ bool JuncTekKGF::verify_checksum(int checksum, const char* buffer)
   const bool checksum_valid = (total % 255) + 1 == checksum;
   ESP_LOGD("JunkTekKGF", "Recv checksum %d total %ld valid %d", checksum, total, checksum_valid);
   return checksum_valid;
-//  return true;
 }
 
 void JuncTekKGF::loop()
@@ -192,7 +171,6 @@ void JuncTekKGF::loop()
     char buffer[20];
     sprintf(buffer, ":R51=%d,2,1,\r\n", this->address_);
     write_str(buffer);
-//    ESP_LOGE("JunkTekKGF", "buffer = %s", buffer);
   }
 
   if (!this->last_stats_ || (*this->last_stats_ + (10 * 1000)) < start_time)
@@ -201,18 +179,10 @@ void JuncTekKGF::loop()
     char buffer[20];
     sprintf(buffer, ":R50=%d,2,1,\r\n", this->address_);
     write_str(buffer);
-//    ESP_LOGE("JunkTekKGF", "buffer = %s", buffer);
   }
 
 
   if (readline())
-//   {
-//     ESP_LOGE("JunkTekKGF", "readline successful");
-//   }
-//   else
-//   {
-//       ESP_LOGE("JunkTekKGF", "readline fail");
-//   }
   {
     handle_line();
   }
