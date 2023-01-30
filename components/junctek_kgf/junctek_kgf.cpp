@@ -78,20 +78,22 @@ void JuncTekKGF::handle_status(const char* buffer)
   const char* cursor = buffer;
   ESP_LOGE("JunkTekKGF", "buffer = %s", buffer);
   const int address = getval(cursor);
-  ESP_LOGE("JunkTekKGF", "address = %s", address);
+  ESP_LOGE("JunkTekKGF", "address = %d", address);
    if (address != this->address_)
      return;
 
    const int checksum = getval(cursor);
-   if (! verify_checksum(checksum, cursor))
-   {
-    return;
-   } else 
-   {
-       ESP_LOGE("JunkTekKGF", "verify failed");
-   }
+    ESP_LOGE("JunkTekKGF", "checksum = %d", checksum);
+//    if (! verify_checksum(checksum, cursor))
+//    {
+//     return;
+//    } else 
+//    {
+//        ESP_LOGE("JunkTekKGF", "verify failed");
+//    }
 
-//   const float voltage = getval(cursor) / 100.0;
+   const float voltage = getval(cursor) / 100.0;
+    ESP_LOGE("JunkTekKGF", "voltage = %f", voltage);
 //   const float amps = getval(cursor) / 100.0;
 //   const float ampHourRemaining = getval(cursor) / 1000.0;
 //   const float ampHourTotalUsed = getval(cursor) / 100.00;
