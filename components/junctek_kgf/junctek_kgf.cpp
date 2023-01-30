@@ -44,8 +44,8 @@ void JuncTekKGF::handle_settings(const char* buffer)
   if (address != this->address_)
     return;
   const int checksum = getval(cursor);
-  if (! verify_checksum(checksum, cursor))
-    return;
+//  if (! verify_checksum(checksum, cursor))
+//    return;
 
   const float overVoltage = getval(cursor) / 100.0;
   const float underVoltage = getval(cursor) / 100.0;
@@ -81,10 +81,8 @@ void JuncTekKGF::handle_status(const char* buffer)
      return;
 
   const int checksum = getval(cursor);
-  if (! verify_checksum(checksum, cursor))
-    return;
-
-
+//  if (! verify_checksum(checksum, cursor))
+//    return;
   const float voltage = getval(cursor) / 100.0;
   const float amps = getval(cursor) / 100.0;
   const float ampHourRemaining = getval(cursor) / 1000.0;
@@ -153,11 +151,10 @@ bool JuncTekKGF::verify_checksum(int checksum, const char* buffer)
     while (true)
     {
       const int val = getval(buffer);
-      ESP_LOGE("JunkTekKGF", "val = %d", val);
       total += val;
     }
   const bool checksum_valid = (total % 255) + 1 == checksum;
-  ESP_LOGE("JunkTekKGF", "Recv checksum %d total %ld valid %d", checksum, total, checksum_valid);
+  ESP_LOGV("JunkTekKGF", "Recv checksum %d total %ld valid %d", checksum, total, checksum_valid);
   return checksum_valid;
 }
 
