@@ -68,7 +68,7 @@ void JuncTekKGF::handle_settings(const char* buffer)
   //const int currentCurveScale = getval(cursor);
 
   // Save the capacity for calculating the %
-  if (!(batteryAmpHourCapacity<0)
+  if (!(batteryAmpHourCapacity<0))
     this->battery_capacity_ = batteryAmpHourCapacity;
 
   this->last_settings_ = millis();
