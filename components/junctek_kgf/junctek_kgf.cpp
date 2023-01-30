@@ -128,28 +128,28 @@ void JuncTekKGF::dump_config()
 //   return;
 // }
 
-// bool JuncTekKGF::readline()
-// {
-//   while (available()) {
-//     const char readch = read();
-//     if (readch > 0) {
-//       switch (readch) {
-//         case '\n': // Ignore new-lines
-//           break;
-//         case '\r': // Return on CR
-//           this->line_pos_ = 0;  // Reset position index ready for next time
-//           return true;
-//         default:
-//           if (this->line_pos_ < MAX_LINE_LEN - 1)
-//           {
-//             this->line_buffer_[this->line_pos_++] = readch;
-//             this->line_buffer_[this->line_pos_] = 0;
-//           }
-//       }
-//     }
-//   }
-//   return false;
-// }
+bool JuncTekKGF::readline()
+{
+  while (available()) {
+    const char readch = read();
+    if (readch > 0) {
+      switch (readch) {
+        case '\n': // Ignore new-lines
+          break;
+        case '\r': // Return on CR
+          this->line_pos_ = 0;  // Reset position index ready for next time
+          return true;
+        default:
+          if (this->line_pos_ < MAX_LINE_LEN - 1)
+          {
+            this->line_buffer_[this->line_pos_++] = readch;
+            this->line_buffer_[this->line_pos_] = 0;
+          }
+      }
+    }
+  }
+  return false;
+}
 
 bool JuncTekKGF::verify_checksum(int checksum, const char* buffer)
 {
@@ -190,7 +190,8 @@ void JuncTekKGF::loop()
   }
 
 
-//   if (readline())
+   if (readline())
+     ESP_LOGE("JunkTekKGF", "readline successful, buffer = %s", buffer);
 //   {
 //     handle_line();
 //   }
