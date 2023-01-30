@@ -38,52 +38,53 @@ void JuncTekKGF::dump_config()
   ESP_LOGCONFIG(TAG, "  address: %d", this->address_);
 }
 
-// void JuncTekKGF::handle_settings(const char* buffer)
-// {
-//   const char* cursor = buffer;
-//   const int address = getval(cursor);
-//   if (address != this->address_)
-//     return;
-//   const int checksum = getval(cursor);
-//   if (! verify_checksum(checksum, cursor))
-//     return;
+void JuncTekKGF::handle_settings(const char* buffer)
+{
+  const char* cursor = buffer;
+  const int address = getval(cursor);
+  if (address != this->address_)
+    return;
+  const int checksum = getval(cursor);
+//  if (! verify_checksum(checksum, cursor))
+//    return;
 
-//   const float overVoltage = getval(cursor) / 100.0;
-//   const float underVoltage = getval(cursor) / 100.0;
-//   const float positiveOverCurrent = getval(cursor) / 1000.0;
-//   const float negativeOverCurrent = getval(cursor) / 100.00;
-//   const float overPowerProtection = getval(cursor) / 100.00;
-//   const float overTemperature = getval(cursor) - 100.0;
-//   const int protectionRecoverySeconds = getval(cursor);
-//   const int delayTime = getval(cursor);
-//   const float batteryAmpHourCapacity = getval(cursor) / 10.0;
-//   const int voltageCalibration = getval(cursor);
-//   const int currentCalibration = getval(cursor);
-//   const float temperatureCalibration = getval(cursor) - 100.0;
-//   const int reserved = getval(cursor);
-//   const int relayNormallyOpen = getval(cursor);
-//   const int currentratio = getval(cursor);
-//   // NOTE these are in the docs, but I don't seem to get them
-//   //const int voltageCurveScale = getval(cursor);
-//   //const int currentCurveScale = getval(cursor);
+  const float overVoltage = getval(cursor) / 100.0;
+  const float underVoltage = getval(cursor) / 100.0;
+  const float positiveOverCurrent = getval(cursor) / 1000.0;
+  const float negativeOverCurrent = getval(cursor) / 100.00;
+  const float overPowerProtection = getval(cursor) / 100.00;
+  const float overTemperature = getval(cursor) - 100.0;
+  const int protectionRecoverySeconds = getval(cursor);
+  const int delayTime = getval(cursor);
+  const float batteryAmpHourCapacity = getval(cursor) / 10.0;
+  const int voltageCalibration = getval(cursor);
+  const int currentCalibration = getval(cursor);
+  const float temperatureCalibration = getval(cursor) - 100.0;
+  const int reserved = getval(cursor);
+  const int relayNormallyOpen = getval(cursor);
+  const int currentratio = getval(cursor);
+  // NOTE these are in the docs, but I don't seem to get them
+  //const int voltageCurveScale = getval(cursor);
+  //const int currentCurveScale = getval(cursor);
 
-//   // Save the capacity for calculating the %
-//   this->battery_capacity_ = batteryAmpHourCapacity;
+  // Save the capacity for calculating the %
+  if (!(batteryAmpHourCapacity<0)
+    this->battery_capacity_ = batteryAmpHourCapacity;
 
-//   this->last_settings_ = millis();
-// }
+  this->last_settings_ = millis();
+}
 
 void JuncTekKGF::handle_status(const char* buffer)
 {
   const char* cursor = buffer;
 //  ESP_LOGE("JunkTekKGF", "buffer = %s", buffer);
   const int address = getval(cursor);
-  ESP_LOGE("JunkTekKGF", "address = %d", address);
+//  ESP_LOGE("JunkTekKGF", "address = %d", address);
    if (address != this->address_)
      return;
 
    const int checksum = getval(cursor);
-   ESP_LOGE("JunkTekKGF", "checksum = %d", checksum);
+//   ESP_LOGE("JunkTekKGF", "checksum = %d", checksum);
 //    if (! verify_checksum(checksum, cursor))
 //    {
 //     return;
@@ -136,8 +137,8 @@ void JuncTekKGF::handle_line()
     return;
   if (strncmp(&buffer[2], "50=", 3) == 0)
     handle_status(&buffer[5]);
-//  else if (strncmp(&buffer[2], "51=", 3) == 0)
-//    handle_settings(&buffer[5]);
+  else if (strncmp(&buffer[2], "51=", 3) == 0)
+    handle_settings(&buffer[5]);
 
   return;
 }
