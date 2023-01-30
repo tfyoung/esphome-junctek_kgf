@@ -114,8 +114,8 @@ void JuncTekKGF::handle_status(const char* buffer)
   ESP_LOGE("JunkTekKGF", "direction = %d", direction);
   const int batteryLifeMinutes = getval(cursor);
   ESP_LOGE("JunkTekKGF", "batteryLifeMinutes = %f", batteryLifeMinutes);
-//   const float batteryInternalOhms = getval(cursor) / 100.0;
-//   ESP_LOGV("JunkTekKGF", "Recv %f %f %d %f %f %f", voltage, ampHourRemaining, direction, powerInWatts, amps, temperature);
+  const float batteryInternalOhms = getval(cursor) / 100.0;
+  ESP_LOGE("JunkTekKGF", "Recv %f %f %d %f %f %f", voltage, ampHourRemaining, direction, powerInWatts, amps, temperature);
 //   if (voltage_sensor_)
 //     this->voltage_sensor_->publish_state(voltage);
 //   if (battery_level_sensor_ && this->battery_capacity_)
