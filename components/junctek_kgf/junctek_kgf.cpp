@@ -185,16 +185,16 @@ void JuncTekKGF::loop()
 
 
   if (readline())
-  {
-    ESP_LOGE("JunkTekKGF", "readline successful");
-  }
-  else
-  {
-      ESP_LOGE("JunkTekKGF", "readline fail");
-  }
 //   {
-//     handle_line();
+//     ESP_LOGE("JunkTekKGF", "readline successful");
 //   }
+//   else
+//   {
+//       ESP_LOGE("JunkTekKGF", "readline fail");
+//   }
+  {
+    handle_line();
+  }
 }
 
 float JuncTekKGF::get_setup_priority() const
