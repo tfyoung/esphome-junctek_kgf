@@ -97,7 +97,7 @@ void JuncTekKGF::handle_status(const char* buffer)
   const float amps = getval(cursor) / 100.0;
   ESP_LOGE("JunkTekKGF", "amperage = %f", amps);
   const float ampHourRemaining = getval(cursor) / 1000.0;
-  ESP_LOGE("JunkTekKGF", "amps left = %f", ampoHourRemaining);
+  ESP_LOGE("JunkTekKGF", "amps left = %f", ampHourRemaining);
   const float ampHourTotalUsed = getval(cursor) / 100.00;
   ESP_LOGE("JunkTekKGF", "amps used = %f", ampHourTotalUsed);
   const float wattHourRemaining = getval(cursor) / 100.0;
