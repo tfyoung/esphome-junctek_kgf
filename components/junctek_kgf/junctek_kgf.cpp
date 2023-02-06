@@ -1,33 +1,47 @@
 #include "junctek_kgf.h"
 
 #include "esphome/core/log.h"
+#include "esphome/core/optional.h"
+
 
 #include <string>
 #include <string.h>
 
-#include<setjmp.h>
+#include <setjmp.h>
+
 static jmp_buf parsing_failed;
 static const char *const TAG = "JunkTek KG-F";
 
-// Get a value where it's expected to be "<number>[,.], incrementing the cursor past the end"
-int getval(const char*& cursor)
+esphome::optional<int> try_getval(const char*& cursor)
 {
+  long val;
   const char* pos = cursor;
   char* end = nullptr;
-  const long val = strtoll(pos, &end, 10);
+  val = strtoll(pos, &end, 10);
   if (end == pos || end == nullptr)
   {
-    ESP_LOGE("JunkTekKGF", "Error invalid number %s", cursor);
-    longjmp(parsing_failed, 1);
+    return nullopt;
   }
   if (*end != ',' && *end != '.')
   {
     ESP_LOGE("JunkTekKGF", "Error no coma %s", cursor);
-    longjmp(parsing_failed, 1);
+    return nullopt;
   }
-  cursor = end + 1;
+  cursor = end + 1; // Skip coma
   return val;
 }
+
+// Get a value where it's expected to be "<number>[,.], incrementing the cursor past the end"
+int getval(const char*& cursor)
+{
+  auto val = try_getval(cursor);
+  if (!val)
+  {
+    longjmp(parsing_failed, 1);
+  }
+  return *val;
+}
+  
 
 JuncTekKGF::JuncTekKGF(unsigned address)
   : address_(address)
@@ -42,6 +56,7 @@ void JuncTekKGF::dump_config()
 
 void JuncTekKGF::handle_settings(const char* buffer)
 {
+  ESP_LOGD("JunkTekKGF", "Settings %s", buffer);
   const char* cursor = buffer;
   const int address = getval(cursor);
   if (address != this->address_)
@@ -77,11 +92,12 @@ void JuncTekKGF::handle_settings(const char* buffer)
 
 void JuncTekKGF::handle_status(const char* buffer)
 {
+  ESP_LOGD("JunkTekKGF", "Status %s", buffer);
   const char* cursor = buffer;
   const int address = getval(cursor);
   if (address != this->address_)
     return;
-
+ 
   const int checksum = getval(cursor);
   if (! verify_checksum(checksum, cursor))
     return;
@@ -154,10 +170,9 @@ bool JuncTekKGF::readline()
 bool JuncTekKGF::verify_checksum(int checksum, const char* buffer)
 {
   long total = 0;
-  while (true)
+  while (auto val = try_getval(buffer))
   {
-    const int val = getval(buffer);
-    total += val;
+    total += *val;
   }
   const bool checksum_valid = (total % 255) + 1 == checksum;
   ESP_LOGD("JunkTekKGF", "Recv checksum %d total %ld valid %d", checksum, total, checksum_valid);
