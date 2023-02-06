@@ -43,8 +43,9 @@ int getval(const char*& cursor)
 }
   
 
-JuncTekKGF::JuncTekKGF(unsigned address)
+JuncTekKGF::JuncTekKGF(unsigned address, bool invert_current)
   : address_(address)
+  , invert_current_(invert_current)
 {
 }
 
@@ -52,6 +53,7 @@ void JuncTekKGF::dump_config()
 {
   ESP_LOGCONFIG(TAG, "junctek_kgf:");
   ESP_LOGCONFIG(TAG, "  address: %d", this->address_);
+  ESP_LOGCONFIG(TAG, "  invert_current: %s", this->invert_current_ ? "True" : "False");
 }
 
 void JuncTekKGF::handle_settings(const char* buffer)
@@ -120,7 +122,12 @@ void JuncTekKGF::handle_status(const char* buffer)
   if (battery_level_sensor_ && this->battery_capacity_)
     this->battery_level_sensor_->publish_state(ampHourRemaining * 100.0 / *this->battery_capacity_);
   if (current_sensor_)
-    current_sensor_->publish_state(direction == 0 ? amps : - amps);
+  {
+    float adjustedCurrent = direction == 0 ? amps : -amps;
+    if (invert_current_)
+      adjustedCurrent *= -1;
+    current_sensor_->publish_state(adjustedCurrent);
+  }
   if (temperature_)
     this->temperature_->publish_state(temperature);
 

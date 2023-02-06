@@ -33,6 +33,7 @@ uart:
 sensor:
   - platform: junctek_kgf
     address: 1
+    invert_current: true
     voltage:
       name: "Battery Voltage"
     current:
@@ -45,5 +46,6 @@ sensor:
 
 Not all sensors need to be added.
 Address is assumed to be 1 if not provided. (this is configured on the monitor)
+invert_current: This inverts the reported current, it's recommended to include this option with either true or false (which ever makes the current make more sense for your setup). The default is currently false (and false will match previous behaviour), but may change to true in future updates.
 ## Future work
 More sensors/statistics are possible, as is adjusting various configuration, but haven't currently been added. File an issue if there anything you want to see.

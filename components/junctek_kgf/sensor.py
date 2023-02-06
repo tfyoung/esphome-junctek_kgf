@@ -31,6 +31,7 @@ from esphome.const import (
 )
 
 
+
 DEPENDENCIES = ["uart"]
 
 AUTO_LOAD = ["sensor"]
@@ -41,6 +42,8 @@ TYPES = [
     CONF_BATTERY_LEVEL,
     CONF_TEMPERATURE,
 ]
+
+CONF_INVERT_CURRENT="invert_current"
 
 JuncTekKGF = cg.global_ns.class_(
     "JuncTekKGF", cg.Component, uart.UARTDevice
@@ -79,6 +82,7 @@ CONFIG_SCHEMA = cv.All(
                 device_class=DEVICE_CLASS_TEMPERATURE,
                 state_class=STATE_CLASS_MEASUREMENT,
             ),
+            cv.Optional(CONF_INVERT_CURRENT, default=False): cv.boolean, 
         }
     ).extend(uart.UART_DEVICE_SCHEMA)
     )
@@ -91,7 +95,7 @@ async def setup_conf(config, key, hub):
 
 
 async def to_code(config):
-    var = cg.new_Pvariable(config[CONF_ID], config[CONF_ADDRESS])
+    var = cg.new_Pvariable(config[CONF_ID], config[CONF_ADDRESS], config[CONF_INVERT_CURRENT])
     await cg.register_component(var, config)
     await uart.register_uart_device(var, config)
     for key in TYPES:

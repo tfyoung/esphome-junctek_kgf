@@ -11,7 +11,7 @@ class JuncTekKGF
   , public uart::UARTDevice
 {
 public:
-  JuncTekKGF(unsigned address = 1);
+  JuncTekKGF(unsigned address = 1, bool invert_current=false);
 
   void set_voltage_sensor(sensor::Sensor *voltage_sensor) { voltage_sensor_ = voltage_sensor; }
   void set_current_sensor(sensor::Sensor *current_sensor) { current_sensor_ = current_sensor; }
@@ -46,4 +46,5 @@ protected:
   optional<float> battery_capacity_;
   optional<unsigned long> last_settings_;
   optional<unsigned long> last_stats_;
+  bool invert_current_;
 };
