@@ -3,7 +3,6 @@
 #include "esphome/core/log.h"
 #include "esphome/core/optional.h"
 
-
 #include <string>
 #include <string.h>
 
@@ -12,59 +11,47 @@
 static jmp_buf parsing_failed;
 static const char *const TAG = "JunkTek KG-F";
 
-esphome::optional<int> try_getval(const char*& cursor)
-{
+esphome::optional<int> try_getval(const char *&cursor) {
   long val;
-  const char* pos = cursor;
-  char* end = nullptr;
+  const char *pos = cursor;
+  char *end = nullptr;
   val = strtoll(pos, &end, 10);
-  if (end == pos || end == nullptr)
-  {
+  if (end == pos || end == nullptr) {
     return nullopt;
   }
-  if (*end != ',' && *end != '.')
-  {
+  if (*end != ',' && *end != '.') {
     ESP_LOGE("JunkTekKGF", "Error no coma %s", cursor);
     return nullopt;
   }
-  cursor = end + 1; // Skip coma
+  cursor = end + 1;  // Skip coma
   return val;
 }
 
 // Get a value where it's expected to be "<number>[,.], incrementing the cursor past the end"
-int getval(const char*& cursor)
-{
+int getval(const char *&cursor) {
   auto val = try_getval(cursor);
-  if (!val)
-  {
+  if (!val) {
     longjmp(parsing_failed, 1);
   }
   return *val;
 }
-  
 
-JuncTekKGF::JuncTekKGF(unsigned address, bool invert_current)
-  : address_(address)
-  , invert_current_(invert_current)
-{
-}
+JuncTekKGF::JuncTekKGF(unsigned address, bool invert_current) : address_(address), invert_current_(invert_current) {}
 
-void JuncTekKGF::dump_config()
-{
+void JuncTekKGF::dump_config() {
   ESP_LOGCONFIG(TAG, "junctek_kgf:");
   ESP_LOGCONFIG(TAG, "  address: %d", this->address_);
   ESP_LOGCONFIG(TAG, "  invert_current: %s", this->invert_current_ ? "True" : "False");
 }
 
-void JuncTekKGF::handle_settings(const char* buffer)
-{
+void JuncTekKGF::handle_settings(const char *buffer) {
   ESP_LOGD("JunkTekKGF", "Settings %s", buffer);
-  const char* cursor = buffer;
+  const char *cursor = buffer;
   const int address = getval(cursor);
   if (address != this->address_)
     return;
   const int checksum = getval(cursor);
-  if (! verify_checksum(checksum, cursor))
+  if (!verify_checksum(checksum, cursor))
     return;
 
   const float overVoltage = getval(cursor) / 100.0;
@@ -83,8 +70,8 @@ void JuncTekKGF::handle_settings(const char* buffer)
   const int relayNormallyOpen = getval(cursor);
   const int currentratio = getval(cursor);
   // NOTE these are in the docs, but I don't seem to get them
-  //const int voltageCurveScale = getval(cursor);
-  //const int currentCurveScale = getval(cursor);
+  // const int voltageCurveScale = getval(cursor);
+  // const int currentCurveScale = getval(cursor);
 
   // Save the capacity for calculating the %
   this->battery_capacity_ = batteryAmpHourCapacity;
@@ -92,16 +79,15 @@ void JuncTekKGF::handle_settings(const char* buffer)
   this->last_settings_ = millis();
 }
 
-void JuncTekKGF::handle_status(const char* buffer)
-{
+void JuncTekKGF::handle_status(const char *buffer) {
   ESP_LOGD("JunkTekKGF", "Status %s", buffer);
-  const char* cursor = buffer;
+  const char *cursor = buffer;
   const int address = getval(cursor);
   if (address != this->address_)
     return;
- 
+
   const int checksum = getval(cursor);
-  if (! verify_checksum(checksum, cursor))
+  if (!verify_checksum(checksum, cursor))
     return;
 
   const float voltage = getval(cursor) / 100.0;
@@ -116,13 +102,13 @@ void JuncTekKGF::handle_status(const char* buffer)
   const int direction = getval(cursor);
   const int batteryLifeMinutes = getval(cursor);
   const float batteryInternalOhms = getval(cursor) / 100.0;
-  ESP_LOGV("JunkTekKGF", "Recv %f %f %d %f %f %f", voltage, ampHourRemaining, direction, powerInWatts, amps, temperature);
+  ESP_LOGV("JunkTekKGF", "Recv %f %f %d %f %f %f", voltage, ampHourRemaining, direction, powerInWatts, amps,
+           temperature);
   if (voltage_sensor_)
     this->voltage_sensor_->publish_state(voltage);
   if (battery_level_sensor_ && this->battery_capacity_)
     this->battery_level_sensor_->publish_state(ampHourRemaining * 100.0 / *this->battery_capacity_);
-  if (current_sensor_)
-  {
+  if (current_sensor_) {
     float adjustedCurrent = direction == 0 ? amps : -amps;
     if (invert_current_)
       adjustedCurrent *= -1;
@@ -134,13 +120,12 @@ void JuncTekKGF::handle_status(const char* buffer)
   this->last_stats_ = millis();
 }
 
-void JuncTekKGF::handle_line()
-{
-  //A failure in parsing will return back to here with a non-zero value
+void JuncTekKGF::handle_line() {
+  // A failure in parsing will return back to here with a non-zero value
   if (setjmp(parsing_failed))
     return;
-  
-  const char* buffer = &this->line_buffer_[0];
+
+  const char *buffer = &this->line_buffer_[0];
   if (buffer[0] != ':' || buffer[1] != 'r')
     return;
   if (strncmp(&buffer[2], "50=", 3) == 0)
@@ -151,20 +136,18 @@ void JuncTekKGF::handle_line()
   return;
 }
 
-bool JuncTekKGF::readline()
-{
+bool JuncTekKGF::readline() {
   while (available()) {
     const char readch = read();
     if (readch > 0) {
       switch (readch) {
-        case '\n': // Ignore new-lines
+        case '\n':  // Ignore new-lines
           break;
-        case '\r': // Return on CR
+        case '\r':              // Return on CR
           this->line_pos_ = 0;  // Reset position index ready for next time
           return true;
         default:
-          if (this->line_pos_ < MAX_LINE_LEN - 1)
-          {
+          if (this->line_pos_ < MAX_LINE_LEN - 1) {
             this->line_buffer_[this->line_pos_++] = readch;
             this->line_buffer_[this->line_pos_] = 0;
           }
@@ -174,11 +157,9 @@ bool JuncTekKGF::readline()
   return false;
 }
 
-bool JuncTekKGF::verify_checksum(int checksum, const char* buffer)
-{
+bool JuncTekKGF::verify_checksum(int checksum, const char *buffer) {
   long total = 0;
-  while (auto val = try_getval(buffer))
-  {
+  while (auto val = try_getval(buffer)) {
     total += *val;
   }
   const bool checksum_valid = (total % 255) + 1 == checksum;
@@ -186,33 +167,26 @@ bool JuncTekKGF::verify_checksum(int checksum, const char* buffer)
   return checksum_valid;
 }
 
-void JuncTekKGF::loop()
-{
+void JuncTekKGF::loop() {
   const unsigned long start_time = millis();
 
-  if (!this->last_settings_ || (*this->last_settings_ + (30 * 1000)) < start_time)
-  {
+  if (!this->last_settings_ || (*this->last_settings_ + (30 * 1000)) < start_time) {
     this->last_settings_ = start_time;
     char buffer[20];
     sprintf(buffer, ":R51=%d,2,1,\r\n", this->address_);
     write_str(buffer);
   }
 
-  if (!this->last_stats_ || (*this->last_stats_ + (10 * 1000)) < start_time)
-  {
+  if (!this->last_stats_ || (*this->last_stats_ + (10 * 1000)) < start_time) {
     this->last_stats_ = start_time;
     char buffer[20];
     sprintf(buffer, ":R50=%d,2,1,\r\n", this->address_);
     write_str(buffer);
   }
 
-  if (readline())
-  {
+  if (readline()) {
     handle_line();
   }
 }
 
-float JuncTekKGF::get_setup_priority() const
-{
-  return setup_priority::DATA;
-}
+float JuncTekKGF::get_setup_priority() const { return setup_priority::DATA; }
