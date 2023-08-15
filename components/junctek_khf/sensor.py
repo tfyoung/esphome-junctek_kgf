@@ -45,14 +45,14 @@ TYPES = [
 
 CONF_INVERT_CURRENT="invert_current"
 
-JuncTekKGF = cg.global_ns.class_(
-    "JuncTekKGF", cg.Component, uart.UARTDevice
+JuncTekKHF = cg.global_ns.class_(
+    "JuncTekKHF", cg.Component, uart.UARTDevice
 )
 
 CONFIG_SCHEMA = cv.All(
     cv.Schema(
         {
-            cv.GenerateID(): cv.declare_id(JuncTekKGF),
+            cv.GenerateID(): cv.declare_id(JuncTekKHF),
             cv.Optional(CONF_ADDRESS, default=1): cv.int_range(1, 255),
             cv.Optional(CONF_VOLTAGE): sensor.sensor_schema(
                 unit_of_measurement=UNIT_VOLT,

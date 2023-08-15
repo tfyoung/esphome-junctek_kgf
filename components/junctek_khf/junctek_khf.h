@@ -6,12 +6,12 @@
 
 using namespace esphome;
 
-class JuncTekKGF
+class JuncTekKHF
   : public esphome::Component
   , public uart::UARTDevice
 {
 public:
-  JuncTekKGF(unsigned address = 1, bool invert_current=false);
+  JuncTekKHF(unsigned address = 1, bool invert_current=false);
 
   void set_voltage_sensor(sensor::Sensor *voltage_sensor) { voltage_sensor_ = voltage_sensor; }
   void set_current_sensor(sensor::Sensor *current_sensor) { current_sensor_ = current_sensor; }

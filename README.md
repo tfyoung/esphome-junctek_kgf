@@ -1,8 +1,8 @@
-# esphome-junctek_kgf
-Component for esphome to read status from a Junctek KG-F coulometer/battery monitor via UART
+# esphome-junctek_khf
+Component for esphome to read status from a Junctek KH-F coulometer/battery monitor via UART
 
 ## Features
-Connects to the Junctek KGF series battery monitor via UART (RS-485 adapter needed) and retrieves the following values:
+Connects to the Junctek KHF series battery monitor via UART (RS-485 adapter needed) and retrieves the following values:
 * Battery Voltage
 * Battery Percent
 * Current Amps
@@ -12,7 +12,7 @@ Connects to the Junctek KGF series battery monitor via UART (RS-485 adapter need
 * ESPHome
 
 ## Tested setup
-Tested on ESP32 using a RS-485 uart into a Junctek KG110F, but should work on an ESP8266 and any of the KG-F series
+Tested on ESP32 using a RS-485 uart into a Junctek KH110F, but should work on an ESP8266 and any of the KH-F series
 
 ## Usage
 ### Connect hardware.
@@ -23,7 +23,7 @@ The applicable config for the device should look something like:
 
 ```yaml
 external_components:
-  - source: github://tfyoung/esphome-junctek_kgf
+  - source: github://oli82/esphome-junctek_khf
 
 uart:
   tx_pin: 26
@@ -31,7 +31,7 @@ uart:
   baud_rate: 115200
 
 sensor:
-  - platform: junctek_kgf
+  - platform: junctek_khf
     address: 1
     invert_current: true
     voltage:
