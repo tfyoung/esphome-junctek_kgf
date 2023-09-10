@@ -89,7 +89,7 @@ void JuncTekKGF::handle_settings(const char* buffer)
   // Save the capacity for calculating the %
   this->battery_capacity_ = batteryAmpHourCapacity;
 
-  this->last_settings_ = millis();
+  this->last_settings_ = esphome::millis();
 }
 
 void JuncTekKGF::handle_status(const char* buffer)
@@ -131,7 +131,7 @@ void JuncTekKGF::handle_status(const char* buffer)
   if (temperature_)
     this->temperature_->publish_state(temperature);
 
-  this->last_stats_ = millis();
+  this->last_stats_ = esphome::millis();
 }
 
 void JuncTekKGF::handle_line()
@@ -188,7 +188,7 @@ bool JuncTekKGF::verify_checksum(int checksum, const char* buffer)
 
 void JuncTekKGF::loop()
 {
-  const unsigned long start_time = millis();
+  const unsigned long start_time = esphome::millis();
 
   if (!this->last_settings_ || (*this->last_settings_ + (30 * 1000)) < start_time)
   {
